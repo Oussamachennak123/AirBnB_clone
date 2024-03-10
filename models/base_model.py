@@ -6,8 +6,18 @@ from datetime import datetime
 
 
 class BaseModel:
-    def __init__(self):
-        self.id = str(uuid.uuid4())
+    def __init__(self, *arg, **kwargs):
+        tim_format = "%Y-%m-%dT%H:%M:%S.%f"
+        if kwargs:
+            for key1, value in kwargs.items():
+                if key1 == "__class__":
+                    continue
+                elif key1 == "created_at" or key1 == "updated_at":
+                    setattr(self, key1, datetime.strptime(value, tim_format))
+                else:
+                    setattr(self, key1, value)
+        else:
+            self.id = str(uuid.uuid4())
 
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
