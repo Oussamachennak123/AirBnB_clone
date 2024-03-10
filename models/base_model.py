@@ -27,8 +27,8 @@ class BaseModel:
         """
         key11_dict = {'__class__': self.__class__.__name__}
         key11_dict.update({aa: bb.isoformat()
-                        if isinstance(bb, datetime)
-                        else bb for aa, bb in self.__dict__.items()})
+            if isinstance(bb, datetime)
+            else bb for aa, bb in self.__dict__.items()})
         return key11_dict
 
 
