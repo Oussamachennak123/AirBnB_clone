@@ -2,6 +2,7 @@
 import sys
 import uuid
 from datetime import datetime
+import models
 """ define class BaseModel"""
 
 
@@ -19,8 +20,10 @@ class BaseModel:
         else:
             self.id = str(uuid.uuid4())
 
-        self.created_at = datetime.utcnow()
-        self.updated_at = datetime.utcnow()
+            self.created_at = datetime.utcnow()
+            self.updated_at = datetime.utcnow()
+        
+        models.Storage.new(self)
 
     def __str__(self):
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
@@ -28,7 +31,8 @@ class BaseModel:
     def save(self):
         """A method to save attributes
         """
-        self.updated_at = datetime.now
+        self.updated_at = datetime.utcnow()
+        models.Storage.save()
 
     def to_dict(self):
         """the key-paired values to dictionary

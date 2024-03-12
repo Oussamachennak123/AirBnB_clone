@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 import os
 import json
 from models.base_model import base_model
@@ -26,3 +24,16 @@ class FileStorage:
 
         with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
             json.dump(dict_obj, file)
+
+    def reload(self):
+        if os.path.isfile(FileStorage.__file_path):
+            with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
+                try:
+                    dict_obj = json.load(file)
+                    for key1, value in dict_obj.items():
+                        class__name, obj_id =key1.split('.')
+                        cls =  eval(class__name)
+                        instance = cls(**value)
+                        FileStorage.__objects[key1] = instance
+                except Exception:
+                    pass
