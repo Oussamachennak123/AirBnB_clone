@@ -1,5 +1,5 @@
-import os
 import json
+import os
 from models.base_model import base_model
 
 
@@ -8,22 +8,21 @@ class FileStorage:
     __file_path = "file.json"
     __objects = {}
 
-    def all(self):
-        return FileStorage.__objects
-    
     def new(self, obj):
         obj__cls__name = obj.__class__.__name__
         key1 = "{}.{}".format(obj__cls__name, obj.id)
         FileStorage.__objects[key1] = obj
+
+    def all(self):
+        return FileStorage.__objects
 
     def save(self):
         all__objs = FileStorage.__objects
         dict_obj = {}
         for obj in all__objs.keys():
             dict_obj[obj] = all__objs[obj].to_dict()
-
-        with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
-            json.dump(dict_obj, file)
+            with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
+                json.dump(dict_obj, file)
 
     def reload(self):
         if os.path.isfile(FileStorage.__file_path):
@@ -33,7 +32,7 @@ class FileStorage:
                     for key1, value in dict_obj.items():
                         class__name, obj_id =key1.split('.')
                         cls =  eval(class__name)
-                        instance = cls(**value)
+                        instance = cls(**values)
                         FileStorage.__objects[key1] = instance
                 except Exception:
                     pass

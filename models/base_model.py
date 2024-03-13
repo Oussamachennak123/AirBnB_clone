@@ -25,9 +25,6 @@ class BaseModel:
         
         models.Storage.new(self)
 
-    def __str__(self):
-        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
-
     def save(self):
         """A method to save attributes
         """
@@ -39,12 +36,15 @@ class BaseModel:
         Returns:
             dict: return dictionary
         """
-        key11_dict = {'__class__': self.__class__.__name__}
-        key11_dict.update({aa: bb.isoformat()
-            if isinstance(bb, datetime)
-            else bb for aa, bb in self.__dict__.items()})
-        return key11_dict
+        inst__dict = self.__dict__.copy()
+        inst__dict["__class"] = self.__class__.__name__
+        inst__dict["created_at"] = self.created_at.isoformat()
+        inst__dict["updated_at"] = self.updated_at.isoformat()
 
+        return inst__dict
+
+    def __str__(self):
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
 if __name__ == "__main__":
     my_model = BaseModel()
