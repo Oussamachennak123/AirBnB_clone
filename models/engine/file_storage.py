@@ -13,35 +13,113 @@ from models.review import Review
 
 
 class FileStorage:
-    """ define class FileStorage"""
-    __file_path = "file.json"
+
+    """Class for storing and retrieving data"""
+    __file_path = "file_object.json"
     __objects = {}
 
-    def new(self, obj):
-        obj__cls__name = obj.__class__.__name__
-        key1 = "{}.{}".format(obj__cls__name, obj.id)
-        FileStorage.__objects[key1] = obj
-
-    def all(self):
+    def all(self, model_type=None):
+        """Returns the dictionary __objects
+        or objects of a specific model type"""
+        if model_type:
+            objects = {
+                key: obj
+                for key, obj in FileStorage.__objects.items()
+                if isinstance(obj, self.classes().get(model_type))
+            }
+            return [str(obj) for obj in objects.values()]
         return FileStorage.__objects
 
+    def new(self, obj):
+        """sets in __objects the obj with key <obj class name>.id"""
+        key = f"{type(obj).__name__}.{obj.id}"
+        FileStorage.__objects[key] = obj
+
     def save(self):
-        all__objs = FileStorage.__objects
-        dict_obj = {}
-        for obj in all__objs.keys():
-            dict_obj[obj] = all__objs[obj].to_dict()
-            with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
-                json.dump(dict_obj, file)
+        """ serializes __objects to the JSON file (path: __file_path)"""
+        with open(FileStorage.__file_path, "w", encoding="utf-8") as file:
+            dic_t = {
+                k: a.to_dict()
+                for k, a in FileStorage.__objects.items()
+                }
+            json.dump(dic_t, file)
+
+    def delete(self, obj):
+        """Deletes obj from __objects if it exists"""
+        del FileStorage.__objects[obj]
+        self.save()
+
+    def classes(self):
+        """Returns a dictionary of valid classes and their references"""
+
+        classes = {
+            "BaseModel": BaseModel,
+            "User": User,
+            "State": State,
+            "City": City,
+            "Amenity": Amenity,
+            "Place": Place,
+            "Review": Review
+            }
+        return classes
 
     def reload(self):
-        if os.path.isfile(FileStorage.__file_path):
-            with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
-                try:
-                    dict_obj = json.load(file)
-                    for key1, value in dict_obj.items():
-                        class__name, obj_id =key1.split('.')
-                        cls =  eval(class__name)
-                        instance = cls(**values)
-                        FileStorage.__objects[key1] = instance
-                except Exception:
-                    pass
+        """Reloads the stored objects"""
+        if not os.path.isfile(FileStorage.__file_path):
+            return
+        with open(FileStorage.__file_path, "r", encoding="utf-8") as file:
+            obj_dict = json.load(file)
+            obj_dict = {k: self.classes()[v["__class__"]](**v)
+                        for k, v in obj_dict.items()}
+            FileStorage.__objects = obj_dict
+
+    def attributes(self):
+        """Returns the valid attributes and their types for classname"""
+        attributes = {
+                "BaseModel": {
+                    "id": str,
+                    "created_at": datetime.datetime,
+                    "updated_at": datetime.datetime
+                    },
+
+                "User": {
+                    "email": str,
+                    "password": str,
+                    "first_name": str,
+                    "last_name": str
+                    },
+
+                "State": {
+                    "name": str
+                    },
+
+                "City": {
+                    "state_id": str,
+                    "name": str
+                    },
+
+                "Amenity": {
+                    "name": str
+                    },
+
+                "Place": {
+                    "city_id": str,
+                    "user_id": str,
+                    "name": str,
+                    "description": str,
+                    "number_rooms": int,
+                    "number_bathrooms": int,
+                    "max_guest": int,
+                    "price_by_night": int,
+                    "latitude": float,
+                    "longitude": float,
+                    "amenity_ids": list
+                    },
+
+                "Review": {
+                    "place_id": str,
+                    "user_id": str,
+                    "text": str
+                    }
+                }
+        return attributes
