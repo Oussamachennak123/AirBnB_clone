@@ -2,7 +2,9 @@
 import sys
 import uuid
 from datetime import datetime
-""" define class BaseModel"""
+import models
+
+sys.path.append('..')
 
 
 class BaseModel:
@@ -10,15 +12,15 @@ class BaseModel:
 
     def __init__(self, *_args, **kwargs):
         if kwargs:
-            for key1, value in kwargs.items():
-                if key1 == "created_at":
+            for key, value in kwargs.items():
+                if key == "created_at":
                     self.__dict__["created_at"] = datetime.strptime(
                         value, "%Y-%m-%dT%H:%M:%S.%f")
-                elif key1 == "updated_at":
+                elif key == "updated_at":
                     self.__dict__["updated_at"] = datetime.strptime(
                         value, "%Y-%m-%dT%H:%M:%S.%f")
                 else:
-                    self.__dict__[key1] = value
+                    self.__dict__[key] = value
         else:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
@@ -41,7 +43,7 @@ class BaseModel:
             dict: return dictionary
         """
         cls_dict = {'__class__': self.__class__.__name__}
-        cls_dict.update({k: v.isoformat()
-                        if isinstance(v, datetime)
-                        else v for k, v in self.__dict__.items()})
+        cls_dict.update({a: b.isoformat()
+                        if isinstance(b, datetime)
+                        else b for a, b in self.__dict__.items()})
         return cls_dict
