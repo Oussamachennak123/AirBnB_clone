@@ -2,7 +2,6 @@
 import sys
 import uuid
 from datetime import datetime
-import models
 """ define class BaseModel"""
 
 
